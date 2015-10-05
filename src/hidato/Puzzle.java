@@ -11,6 +11,7 @@ public class Puzzle {
 	ArrayList<Integer[]> unfilled = new ArrayList<Integer[]>();
 	Square[][] puzzle;
 	Scanner in;
+	ArrayList<Integer> validNum = new ArrayList<Integer>();
 	private static int[][] directions = new int[][] { { -1, -1 }, { -1, 0 },
 			{ -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 } };
 
@@ -36,57 +37,22 @@ public class Puzzle {
 	}
 
 	public void setUpValidNum() {
+		validNum.clear();
+		for (int i = 1; i < (size * size) + 1; i++){
+			validNum.add(i);
+		}
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-				for (int k = 0; k < size * size; k++) {
-					puzzle[i][j].validNumbers.add(k);
-				}
+				if (puzzle[i][j].getNum() != 0)
+					validNum.remove(puzzle[i][j].getNum());
 			}
 		}
 	}
 
-	public void updateSquares() {
-		ArrayList<Integer> temp = new ArrayList<Integer>();
-		ArrayList<Integer> temp2 = new ArrayList<Integer>();
-		ArrayList<Integer> remove = new ArrayList<Integer>();
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				remove.clear();
-				temp.clear();
-				for (int[] d : directions) {
-					try {
-						if (temp.contains(puzzle[i + d[0]][j + d[1]].getNum() + 1))
-							temp2.add(puzzle[i + d[0]][j + d[1]].getNum() + 1);
-						else
-							temp.add(puzzle[i + d[0]][j + d[1]].getNum() + 1);
-						if (temp.contains(puzzle[i + d[0]][j + d[1]].getNum() - 1))
-							temp2.add(puzzle[i + d[0]][j + d[1]].getNum() - 1);
-						else
-							temp.add(puzzle[i + d[0]][j + d[1]].getNum() - 1);
+	
+	
 
-					} catch (ArrayIndexOutOfBoundsException e) {
-					}
-				}
-				if (!temp.contains(new Integer(0))) {
-					for (Integer v : puzzle[i][j].validNumbers) {
-						if (!temp2.contains(v)) {
-							remove.add(v);
-						}
-					}
-					puzzle[i][j].removeNums(remove);
-				}
-			}
-		}
-	}
-
-	public boolean forwardCheck() {
-		for (int i = Backtracking.fill; i < unfilled.size(); i++) {
-			if (puzzle[unfilled.get(i)[0]][unfilled.get(i)[1]].validNumbers
-					.size() == 0)
-				return false;
-		}
-		return true;
-	}
+	
 
 	public void removeInvalidNums(ArrayList<Integer> invalidNum) {
 		for (int i = 0; i < size; i++) {
@@ -107,9 +73,29 @@ public class Puzzle {
 	public void addValidNum(int validNum) {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-				puzzle[i][j].validNumbers.add(validNum);
+				this.validNum.add(validNum);
 			}
 		}
+	}
+
+	public boolean checkAround(int i, int j) {
+		setUpValidNum();
+		int count = 0;
+		int temp = puzzle[i][j].getNum();
+		for (int[] d : directions) {
+			try {
+				if (puzzle[i + d[0]][j + d[1]].getNum() + 1 == temp)
+					count++;
+				else if (puzzle[i + d[0]][j + d[1]].getNum() - 1 == temp)
+					count++;
+				else if (puzzle[i + d[0]][j + d[1]].getNum() == 0 && validNum.contains(temp + 1))
+					count++;
+				else if (puzzle[i + d[0]][j + d[1]].getNum() == 0 && validNum.contains(temp - 1))
+					count++;
+			} catch (ArrayIndexOutOfBoundsException e) {
+			}
+		}
+		return (count >= 2);
 	}
 
 	public String toString() {

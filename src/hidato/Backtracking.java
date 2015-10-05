@@ -13,7 +13,7 @@ public class Backtracking {
 		puzzle = new Puzzle();
 		setupInvalidNum();
 		puzzle.removeInvalidNums(invalidNum);
-		puzzle.updateSquares();
+		puzzle.setUpValidNum();
 		hidato(puzzle.unfilled.get(0)[0], puzzle.unfilled.get(0)[1]);
 	}
 
@@ -29,30 +29,34 @@ public class Backtracking {
 	}
 
 	public void hidato(int i, int j) {
-		puzzle.updateSquares();
+		
+		puzzle.setUpValidNum();
 		fill++;
-		if (!puzzle.forwardCheck()){
-			System.out.println(i + " " + j);
-			fill--;
-			return;
+		
+			
+		ArrayList<Integer> temp = new ArrayList<Integer>(puzzle.validNum);
+		for (Integer v = 0; v < temp.size(); v ++){
+			
+			
+			puzzle.puzzle[i][j].setNum(temp.get(v));
+			if (puzzle.checkAround(i,j)){
+					
+				//System.out.print(puzzle);
+				if (fill == puzzle.unfilled.size()){
+					System.out.println(puzzle.size);
+					System.out.print(puzzle);
+					System.exit(0);
+				}
+					hidato(puzzle.unfilled.get(fill)[0], puzzle.unfilled.get(fill)[1]);
+				
+				
+				
+			}
+			
+			
 			
 		}
-		
-		//if (puzzle.unfilled.isEmpty()){
-		//	System.out.print(puzzle);
-		//	System.exit(0);
-		//}
-			
-		
-		for (Integer v : puzzle.puzzle[i][j].validNumbers) {
-			puzzle.updateSquares();
-			puzzle.puzzle[i][j].setNum(v);
-			puzzle.removeInvalidNum(v);			
-			System.out.print(puzzle);
-			hidato(puzzle.unfilled.get(fill)[0], puzzle.unfilled.get(fill)[1]);
-			puzzle.addValidNum(v);
-			
-		}
+		puzzle.puzzle[i][j].setNum(0);
 		fill--;
 		
 	}
